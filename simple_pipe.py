@@ -70,7 +70,8 @@ class ClusterJob(object):
         fh.close()
 
         # submit job and get job number
-        out = check_output('bash %s' % self.job_name, shell = True)
+        #out = check_output('bash %s' % self.job_name, shell = True)
+        out = check_output('ccc_msub %s' % self.job_name, shell = True)
         match = re.search('(\d+)', out)
         if match:
             self.job_id = match.group(1)
@@ -78,14 +79,15 @@ class ClusterJob(object):
     # monitor if job is in the queue, i.e. basically pending or running
     def monitor(self):
 
-        while( __check_cluster_queue == True):
+        while( self.__check_cluster_queue() == True):
+            print "job " + self.job_id + " is running.."
             sleep(10)
 
     def __check_cluster_queue(self):
         ret = False
-        out = check_output('squeue', shell = true)
+        out = check_output('squeue', shell = True)
         for line in out.split('\n'):
-            if self.job_id == line.strip().split()[0]:
+            if len(line) > 0 and self.job_id == line.strip().split()[0]:
                 ret = True
                 break
         return ret
