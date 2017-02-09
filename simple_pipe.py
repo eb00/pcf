@@ -2,6 +2,7 @@ from subprocess import check_output
 import re
 from time import sleep
 
+
 class ClusterJob(object):
 
     bridge_headers = {
