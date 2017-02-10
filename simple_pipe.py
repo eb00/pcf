@@ -1,7 +1,7 @@
-from subprocess import check_output
+from subprocess import check_output, CalledProcessError
 import re
 from time import sleep
-
+from sys import exit
 
 class ClusterJob(object):
 
@@ -72,7 +72,15 @@ class ClusterJob(object):
 
         # submit job and get job number
         #out = check_output('bash %s' % self.job_name, shell = True)
-        out = check_output('ccc_msub %s' % self.job_name, shell = True)
+        out = None
+        try:
+            out = check_output('ccc_msub %s' % self.job_name, shell = True)
+        except CalledProcessError, e:
+            print "An error occured while trying to submit the job."
+            print "Error message:"
+            print e.output
+            exit(0)
+
         match = re.search('(\d+)', out)
         if match:
             self.job_id = match.group(1)
