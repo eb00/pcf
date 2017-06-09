@@ -33,14 +33,6 @@ class ClusterJob(object):
         except:
             pass
 
-        # set shell commands for the job
-        try:
-            if kwargs['cmd']:
-                for line in kwargs['cmd']:
-                    self.shell_cmd.append(line)
-        except:
-            pass
-
         # set multiple commands with the ccc_mprun prefix + wait final
         try:
             if kwargs['msub']:
@@ -48,6 +40,14 @@ class ClusterJob(object):
                     cmd_line = 'ccc_mprun -n1 bash -c "' + cmd + '" &'
                     self.shell_cmd.append(cmd_line)
                 self.shell_cmd.append('wait')
+        except:
+            pass
+
+        # set shell commands for the job
+        try:
+            if kwargs['cmd']:
+                for line in kwargs['cmd']:
+                    self.shell_cmd.append(line)
         except:
             pass
 
