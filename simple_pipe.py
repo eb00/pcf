@@ -32,7 +32,7 @@ class ClusterJob(object):
                 self.job_name = kwargs['job_name'] 
         except:
             pass
-
+        
         # set multiple commands with the ccc_mprun prefix + wait final
         try:
             if kwargs['msub']:
@@ -61,7 +61,6 @@ class ClusterJob(object):
         
     def submit(self):
 
-        # build shell file 
         fh = open(self.job_name, 'w')
         fh.write(self.shell_header + '\n')
         for line in self.job_headers:
@@ -100,6 +99,15 @@ class ClusterJob(object):
                 ret = True
                 break
         return ret
+
+    def print_cmd(self):
+        """just print the job shell command to the screen."""
+        print self.job_name
+        print self.shell_header
+        for line in self.job_headers:
+            print line
+        for line in self.shell_cmd:
+            print line
  
 
 
