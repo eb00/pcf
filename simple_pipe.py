@@ -4,35 +4,34 @@ from time import sleep
 from sys import exit
 
 class ClusterJob(object):
-
-    bridge_headers = {
-        'project': '#MSUB -A',
-        'ncores': '#MSUB -c',
-        'error_file': '#MSUB -e',
-        'ntasks': '#MSUB -n',
-        'nnodes': '#MSUB -N',
-        'output_file': '#MSUB -o',
-        'queue': '#MSUB -q',
-        'time': '#MSUB -T'
-    }
-
-    shell_header = '#!/bin/bash'
-    shell_cmd = []
-    job_headers = []
-    job_name = 'cmd' 
-    job_id = '0'
     
     def __init__(self, **kwargs):
         
-        headers_dict = self.bridge_headers 
-       
+        bridge_headers = {
+            'project': '#MSUB -A',
+            'ncores': '#MSUB -c',
+            'error_file': '#MSUB -e',
+            'ntasks': '#MSUB -n',
+            'nnodes': '#MSUB -N',
+            'output_file': '#MSUB -o',
+            'queue': '#MSUB -q',
+            'time': '#MSUB -T'
+        }
+
+        self.shell_header = '#!/bin/bash'
+        self.job_name = 'cmd' 
+        self.job_id = '0'
+        self.shell_cmd = []
+        self.job_headers = []
+
         # set job name (=shell script name)
         try:
             if kwargs['job_name']:
                 self.job_name = kwargs['job_name'] 
         except:
             pass
-        
+ 
+
         # set multiple commands with the ccc_mprun prefix + wait final
         try:
             if kwargs['msub']:
@@ -42,8 +41,7 @@ class ClusterJob(object):
                 self.shell_cmd.append('wait')
         except:
             pass
-
-        # set shell commands for the job
+                # set shell commands for the job
         try:
             if kwargs['cmd']:
                 for line in kwargs['cmd']:
@@ -51,7 +49,7 @@ class ClusterJob(object):
         except:
             pass
 
-
+        headers_dict = bridge_headers 
         # set job options passed in arguments
         for k,v in kwargs.iteritems():
             try:
