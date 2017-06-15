@@ -1,7 +1,8 @@
+import logging
 from subprocess import check_output, CalledProcessError
 import re
 from time import sleep
-from sys import exit
+import sys
 
 class ClusterJob(object):
     
@@ -76,24 +77,23 @@ class ClusterJob(object):
             print "An error occured while trying to submit the job."
             print "Error message:"
             print e.output
-            exit(0)
+            sys.exit(1)
 
         match = re.search('(\d+)', out)
         if match:
             self.job_id = match.group(1)
 
-    # monitor if job is in the queue, i.e. basically pending or running
+    # monitor job in the cluster queue. If the job is not in the queue, it is assumed to be finished.
     def monitor(self):
-
         while( self.__check_cluster_queue() == True):
-            print "job " + self.job_id + " is running.."
             sleep(10)
 
     def __check_cluster_queue(self):
-        ret = False
+        ret = False 
         out = check_output('squeue', shell = True)
         for line in out.split('\n'):
             if len(line) > 0 and self.job_id == line.strip().split()[0]:
+                logging.info("job " + self.job_id + " status " + line.strip().split()[4])
                 ret = True
                 break
         return ret
@@ -106,7 +106,26 @@ class ClusterJob(object):
             print line
         for line in self.shell_cmd:
             print line
+
+    def check_job(self):
+        """ check the status of the job after the run, and if anything strange happened, just quit. """
+        out = check_output('sacct --jobs ' + self.job_id, shell = True)
+        failed = False
+        for w in ['CANCELLED', 'FAILED', 'NODE_FAIL', 'TIMEOUT']:
+            m = re.search(w, out)
+            if m:
+                failed = True
+        for line in out.split('\n'):
+            logging.info("sacct output: " + line)
+
+        if failed == True:
+            logging.error("job " + self.job_id + " failed")
+            sys.exit(1)
+
  
 
+class Utils(object):
 
+    def list_files(self):
+        pass
 
