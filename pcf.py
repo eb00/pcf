@@ -37,7 +37,7 @@ class ClusterJob(object):
         try:
             if kwargs['msub']:
                 for cmd in kwargs['msub']:
-                    cmd_line = 'ccc_mprun -n1 bash -c "' + cmd + '" &'
+                    cmd_line = 'ccc_mprun -n1 -E' + "'--exclusive' " + 'bash -c "' + cmd + '" &' 
                     self.shell_cmd.append(cmd_line)
                 self.shell_cmd.append('wait')
         except:
