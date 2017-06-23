@@ -73,10 +73,9 @@ class ClusterJob(object):
         out = None
         try:
             out = check_output('ccc_msub %s' % self.job_name, shell = True)
-        except CalledProcessError, e:
-            print "An error occured while trying to submit the job."
-            print "Error message:"
-            print e.output
+        except CalledProcessError as e:
+            logging.error("An error occured while trying to submit the job to the cluster")
+            logging.error(e.output)
             sys.exit(1)
 
         match = re.search('(\d+)', out)
