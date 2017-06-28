@@ -37,7 +37,7 @@ class ClusterJob(object):
         try:
             if kwargs['msub']:
                 for cmd in kwargs['msub']:
-                    cmd_line = 'ccc_mprun -n1 -E' + "'--exclusive' " + 'bash -c "' + cmd + '" &' 
+                    cmd_line = 'ccc_mprun -n1 -E' + "'--exclusive' " + 'bash -c "' + cmd + '" &'
                     self.shell_cmd.append(cmd_line)
                 self.shell_cmd.append('wait')
         except:
@@ -123,8 +123,19 @@ class ClusterJob(object):
 
  
 
-class Utils(object):
 
-    def list_files(self):
-        pass
+def shell_list_files(pattern):
+    fl = []
+    try:
+        shell_output = check_output(pattern, shell = True)
+        for line in shell_output.split('\n'):
+            if len(line) > 1:
+                fl.append(line)
+    except Exception as e:
+        logging.error(e)
+        sys.exit(1)
+
+    return fl
+
+
 
