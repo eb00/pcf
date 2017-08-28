@@ -81,6 +81,7 @@ class ClusterJob(object):
         match = re.search('(\d+)', out)
         if match:
             self.job_id = match.group(1)
+            logging.info('job ' + self.job_id + ' submitted')
 
     # monitor job in the cluster queue. If the job is not in the queue, it is assumed to be finished.
     def monitor(self):
