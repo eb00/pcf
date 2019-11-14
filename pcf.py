@@ -4,10 +4,19 @@ import re
 from time import sleep
 import sys
 
+# PCF - Python Cluster workFlow
+#
+# A simple class to build computational pipelines on a SLURM or BRIDGE cluster
+#
+# written by Eric Bonnet 2015 - 2019
+
+
 class ClusterJob(object):
-    
+    """ base class for cluster jobs """
+
     def __init__(self, **kwargs):
         
+        # translate keywords to bridge directives
         bridge_headers = {
             'project': '#MSUB -A',
             'ncores': '#MSUB -c',
@@ -50,7 +59,9 @@ class ClusterJob(object):
         except:
             pass
 
+        # here we use the SLURM/BRIDGE directives
         headers_dict = bridge_headers 
+        
         # set job options passed in arguments
         for k,v in kwargs.iteritems():
             try:
@@ -69,7 +80,6 @@ class ClusterJob(object):
         fh.close()
 
         # submit job and get job number
-        #out = check_output('bash %s' % self.job_name, shell = True)
         out = None
         try:
             out = check_output('ccc_msub %s' % self.job_name, shell = True)
@@ -89,6 +99,7 @@ class ClusterJob(object):
             sleep(10)
 
     def __check_cluster_queue(self):
+        """ check the job status in the cluster queue """ 
         ret = False 
         out = check_output('squeue', shell = True)
         for line in out.split('\n'):
@@ -99,7 +110,7 @@ class ClusterJob(object):
         return ret
 
     def print_cmd(self):
-        """just print the job shell command to the screen."""
+        """ just print the job shell command to the screen. """
         print self.job_name
         print self.shell_header
         for line in self.job_headers:
@@ -111,6 +122,8 @@ class ClusterJob(object):
         """ check the status of the job after the run, and if anything strange happened, just quit. """
         out = check_output('sacct --jobs ' + self.job_id, shell = True)
         failed = False
+        # SLURM error / status codes
+        # If one of those codes appears, then something went wrong
         for w in ['CANCELLED', 'FAILED', 'NODE_FAIL', 'TIMEOUT']:
             m = re.search(w, out)
             if m:
@@ -118,6 +131,7 @@ class ClusterJob(object):
         for line in out.split('\n'):
             logging.info("sacct output: " + line)
 
+        # If something is wrong, stop the pipeline
         if failed == True:
             logging.error("job " + self.job_id + " failed")
             sys.exit(1)
@@ -126,6 +140,7 @@ class ClusterJob(object):
 
 
 def shell_list_files(pattern):
+    """ list files in the current directory according to a unix-like pattern """
     fl = []
     try:
         shell_output = check_output(pattern, shell = True)
